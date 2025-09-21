@@ -80,7 +80,7 @@
     }
     .envelope-wrap img{
       width:100%; height:100%; object-fit:cover; display:block;
-      filter: drop-shadow(0 24px 20px rgba(0,0,0,.45));
+      filter: drop-shadow(0 10px 16px rgba(0,0,0,.45));
     }
     body.open .envelope-wrap{
       opacity:0;
@@ -97,8 +97,8 @@
       transform: translateX(-50%) scale(var(--letter-scale));
       background: url("images/parchment.png") center/cover no-repeat;
       box-shadow:
-        inset 100 100 180px rgba(0,0,0,.25),
-        0 200px 400px rgba(0,0,0,.45);
+        inset 0 10 18px rgba(0,0,0,.25),
+        0 20px 40px rgba(0,0,0,.45);
       position: absolute;
       overflow: visible;
     }
@@ -536,4 +536,5 @@ body:not(.open) .envelope-wrap{
   </script>
 </body>
 </html>
+
 
