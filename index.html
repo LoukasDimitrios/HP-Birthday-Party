@@ -639,6 +639,19 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   .click-hint::after{ display: none; }
 }
 
+
+    /* Mobile portrait: κεντράρει τη γάτα οριζόντια */
+@media (max-width: 600px) and (orientation: portrait){
+  .sig-badge{
+    display: block;           /* από inline -> block για να δουλέψει το auto margin */
+    margin: 12px auto 0;      /* auto left/right => κέντρο */
+    transform: none !important;/* ακύρωσε το translateX */
+    width: 120px;             /* προαιρετικό: λίγο μικρότερο σε κινητό */
+    height: auto;
+  }
+}
+
+
   </style>
 </head>
 
@@ -758,6 +771,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 </body>
 </html>
+
 
 
 
