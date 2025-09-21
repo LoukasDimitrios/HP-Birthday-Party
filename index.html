@@ -433,6 +433,47 @@ body:not(.open) .envelope-wrap{
   mix-blend-mode: multiply; /* να “δένει” λίγο με την περγαμηνή */
   transform: translateX(-304px)
 }
+/* ==== MOBILE FIX (≤ 900px) ==== */
+@media (max-width: 900px){
+  :root{
+    --letter-scale: 1;     /* κόβει το έξτρα scale στο κινητό */
+    --pad-open: 8px;
+    --inner-col-max: 92vw; /* στενότερη στήλη */
+  }
+
+  /* Το γράμμα να πιάνει σχεδόν όλο το πλάτος και να έχει σωστό ύψος */
+  .letter-wrap{
+    width: 92vw;
+    height: auto;                 /* αφήνουμε το ύψος να προσαρμοστεί */
+    aspect-ratio: 2000 / 3800;    /* λόγος πλάτους/ύψους της περγαμηνής */
+    transform: translateX(-50%) scale(1) rotateX(0) rotateZ(0);
+    background-size: 100% 100%;   /* τέντωσε την περγαμηνή αν ψηλώσει το περιεχόμενο */
+    box-shadow: none;             /* (πιο «καθαρό» στο mobile) */
+    filter: drop-shadow(0 12px 18px rgba(0,0,0,.28));
+  }
+
+  .letter-inner{
+    margin: 24px auto;
+    padding-top: 20px;
+    font-size: 20px;
+    line-height: 1.4;
+  }
+
+  .letter-title .title-line1,
+  .letter-title .title-line2{ font-size: 36px; }
+
+  .headmaster-name{ font-size: 18px; letter-spacing: .2em; padding-top: 24px; }
+  .headmaster-quals{ font-size: 16px; line-height: 1.35; }
+
+  .letter-body{ font-size: 20px; max-width: 60ch; margin-top: 20px; padding-top: 20px; }
+
+  .signature{
+    font-size: 36px;
+    transform: translateX(0) translateY(0) rotate(-10deg);
+  }
+
+  .sig-badge{ width: 72px; transform: translateX(0); }
+}
 
 
   </style>
@@ -545,6 +586,7 @@ body:not(.open) .envelope-wrap{
   </script>
 </body>
 </html>
+
 
 
 
