@@ -469,15 +469,11 @@ body:not(.open) .envelope-wrap{
   /* 1) Δείξε σίγουρα την περγαμηνή (ακόμα κι αν έχουμε overrides) */
 .letter-wrap{
   background:
-    url("images/parchment.png") center/cover no-repeat,
+    url("images/parchment.png") center/cover no-repeat;
        /* υπόστρωμα μπεζ σε περίπτωση διαφάνειας */
 }
 
-/* 2) Για δοκιμή: βεβαιώσου ότι το γράμμα φαίνεται όταν ανοίγει */
-body.open .letter-wrap{ opacity: 1 !important; }
 
-/* (προαιρετικά για debugging) δες το γράμμα ακόμη κι όταν είναι κλειστός ο φάκελος */
-// body:not(.open) .letter-wrap{ opacity: 1 !important; }
  */
   </style>
 </head>
@@ -589,6 +585,7 @@ body.open .letter-wrap{ opacity: 1 !important; }
   </script>
 </body>
 </html>
+
 
 
 
