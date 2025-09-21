@@ -584,8 +584,17 @@ body:not(.open) .envelope-wrap{
       }
     });
   </script>
+  <script>
+  // …ο υπάρχων κώδικάς σου (fitStageToLetter, click handler κλπ)…
+
+  window.addEventListener('orientationchange', () => {
+    setTimeout(fitStageToLetter, 250);
+  });
+</script>
+
 </body>
 </html>
+
 
 
 
