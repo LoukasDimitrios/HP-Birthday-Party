@@ -614,6 +614,31 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
   }
 }
 
+
+
+
+
+    /* Να ΜΗΝ σπάει σε 2 γραμμές */
+.click-hint{
+  white-space: nowrap;     /* μία γραμμή μόνο */
+  text-transform: none;    /* κράτα "Click me" όπως είναι */
+}
+
+/* Mobile: να κάθεται ΚΑΤΩ από τον φάκελο και σε μία γραμμή */
+@media (max-width: 600px){
+  .click-hint{
+    bottom: -48px;               /* πόσο κάτω από τον φάκελο */
+    left: 50%;
+    transform: translateX(-50%); /* κέντρο */
+    font-size: clamp(18px, 5vw, 32px);
+    letter-spacing: 0.14em;
+    line-height: 1;
+    white-space: nowrap;         /* καμία αλλαγή γραμμής */
+  }
+  /* αν δεν θέλεις το βελάκι από κάτω, κρύψ’ το: */
+  .click-hint::after{ display: none; }
+}
+
   </style>
 </head>
 
@@ -733,6 +758,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 </body>
 </html>
+
 
 
 
