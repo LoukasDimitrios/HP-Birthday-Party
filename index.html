@@ -534,6 +534,79 @@ body:not(.open) .envelope-wrap{
   }
 }
 
+
+
+
+
+
+
+
+
+
+    /* βελτίωση rendering σε mobile */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
+/* ——— Τελικές διορθώσεις για μικρές οθόνες ——— */
+@media (max-width: 600px){
+
+  /* Κράτα σωστή αναλογία περγαμηνής και μην την “τεντώνεις” */
+  .letter-wrap{
+    width: 92vw;
+    aspect-ratio: 2000 / 3800;   /* ίδιο ratio με τις μεταβλητές σου */
+    height: auto;                /* αφήνουμε το ύψος να προκύψει */
+    transform: translateX(-50%) scale(1) !important;  /* χωρίς επιπλέον scale */
+    box-shadow: none;            /* καθαρότερη εικόνα στο κινητό */
+  }
+
+  body.open .stage{
+    padding: 8px 0 !important;   /* λίγο περιθώριο γύρω από το γράμμα */
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  .letter-inner{ margin: 20px auto; padding-top: 14px; }
+
+  /* Τίτλος: μικρότερο μέγεθος & πιο ήπιο tracking */
+  .letter-title .title-line1,
+  .letter-title .title-line2{
+    font-size: 34px;
+    letter-spacing: .02em;
+    text-shadow: none;
+  }
+  .letter-title{ line-height: 1.2; }
+
+  /* Headmaster */
+  .headmaster-name{
+    font-size: 16px;
+    letter-spacing: .08em;
+  }
+  .headmaster-quals{
+    font-size: 14px;
+    line-height: 1.35;
+    letter-spacing: .02em;
+  }
+
+  /* Κύριο κείμενο: πιο άνετο line-height και λιγότερο spacing */
+  .letter-body{
+    font-size: 18px;
+    line-height: 1.5;
+    letter-spacing: .01em;
+    max-width: 88vw;     /* ας επεκτείνεται λίγο περισσότερο */
+    text-shadow: none;
+  }
+
+  /* Υπογραφή/υπόλοιπα */
+  .signature{ font-size: 40px; transform: none; }
+  .footer{ font-size: 16px; line-height: 1.35; text-shadow: none; }
+  .crest-top{ width: 52vw; }
+}
+
+/* Αν σε πολύ μικρά (<480px) θες ακόμα πιο “καθαρή” γραμματοσειρά για το σώμα
+   (προαιρετικό – βγάλ’ το αν θες να μείνει Lumos) */
+@media (max-width: 480px){
+  .letter-body{ font-family: "IM Fell English", serif; }
+}
+
   </style>
 </head>
 
@@ -646,12 +719,14 @@ body:not(.open) .envelope-wrap{
   window.addEventListener('orientationchange', () => {
     setTimeout(fitStageToLetter, 250);
   });
+    
   </script>
   
 
 
 </body>
 </html>
+
 
 
 
