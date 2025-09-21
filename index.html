@@ -603,7 +603,16 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 /* Αν σε πολύ μικρά (<480px) θες ακόμα πιο “καθαρή” γραμματοσειρά για το σώμα
    (προαιρετικό – βγάλ’ το αν θες να μείνει Lumos) */
-
+/* Κράτα Lumos σε mobile */
+@media (max-width: 600px){
+  .letter-body,
+  .letter-title,
+  .headmaster-name,
+  .headmaster-quals,
+  .footer{
+    font-family: "Lumos", serif !important;
+  }
+}
 
   </style>
 </head>
@@ -724,6 +733,7 @@ html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
 </body>
 </html>
+
 
 
 
