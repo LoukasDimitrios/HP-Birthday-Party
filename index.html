@@ -450,21 +450,6 @@ body:not(.open) .envelope-wrap{
 
 
 
-    /* 1) Σβήσε όλα τα shadows/filters σε envelope/letter/κείμενα */
-.envelope-wrap img,
-.letter-wrap,
-.letter-title, .headmaster-name, .headmaster-quals, .letter-body, .footer{
-  filter: none !important;
-  box-shadow: none !important;
-  text-shadow: none !important;
-}
-
-/* /* 2) Κάνε αόρατα τα overlays (watermark/vignette) για να μη σκοτεινιάζει τίποτα */
-.letter-wrap::before,
-.letter-wrap::after,
-.bg-blur::after{
-  opacity: 0 !important;
-}
 
   /* 1) Δείξε σίγουρα την περγαμηνή (ακόμα κι αν έχουμε overrides) */
 .letter-wrap{
@@ -585,6 +570,7 @@ body:not(.open) .envelope-wrap{
   </script>
 </body>
 </html>
+
 
 
 
