@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hogwarts Invitation</title>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=IM+Fell+English:ital@0;1&family=Great+Vibes&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* === ΔΙΑΧΩΡΙΣΜΟΣ ΜΕΓΕΘΩΝ === */
+      --envelope-width: 800px;
+      --envelope-height: 500px;
+
+      --letter-width: 2000px;
+      --letter-height: 3800px;
+
+      --inner-col-max: 1600px;
+      --inner-side-pad: 0px;
+
+      --crest-width: 650px;
+
+      /* Watermark */
+      --wm-size: 55%;
+      --wm-opacity: 0.06;
+
+      /* === LAYOUT states === */
+      --envelope-scale: 0.95;
+      --pad-closed: 16px;     /* μικρό περιθώριο όταν είναι κλειστό */
+      --letter-scale: 0.55;   /* scale γράμματος */
+      --pad-open: 10px;       /* μικρό περιθώριο όταν είναι ανοιχτό */
+    }
+
+    /* FONTS */
+    @font-face{ font-family:"Pivet"; src:url("fonts/4PrivetDrive-Regular.otf") format("opentype"); font-display:swap; }
+    @font-face{ font-family:"dear";  src:url("fonts/DearMrPotter-Regular.otf") format("opentype"); font-display:swap; }
+    @font-face{ font-family:"Chopin"; src:url("fonts/ChopinScript.ttf") format("truetype"); font-display:swap; }
+    @font-face{ font-family:"James";  src:url("fonts/James Fajardo.ttf") format("truetype"); font-display:swap; }
+    @font-face{ font-family:"Lumos";  src:url("fonts/Lumos.woff2") format("woff2"), url("fonts/Lumos.ttf") format("truetype"); font-display:swap; }
+    @font-face{ font-family:"Alex";   src:url("fonts/AlexBrush-Regular.ttf") format("truetype"); font-display:swap; }
+    @font-face{ font-family:"Brilliant"; src:url("fonts/Brilliant.woff2") format("woff2"), url("fonts/Brilliant.ttf") format("truetype"); font-display:swap; }
+
+    /* Σελιδοποίηση & scroll */
+    html, body { margin:0; height:100%; background:transparent; }
+    body { overflow:auto; }
+
+    /* Stage (μία και μοναδική) */
+    .stage{
+      position: relative;
+      height: 100dvh;          /* όση το viewport όταν είναι κλειστό */
+      min-height: 100dvh;
+      padding: var(--pad-closed) 0;
+      z-index: 1;              /* πάνω από το bg */
+    }
+    body.open .stage{
+      /* το ύψος θα το ορίσει το JS με inline style → αλλά κρατάμε μικρό padding */
+      height: auto;
+      min-height: 0;
+      padding: var(--pad-open) 0;
+      overflow: visible;
+    }
+
+    /* Κοινό κέντρο */
+    .centered{
+      position: absolute;
+      left: 50%;
+      top: 0;
+      transform: translateX(-50%);
+      transition: transform .9s ease, opacity .9s ease, top .9s ease;
+      cursor: pointer;
+    }
+    body.open .centered{ top: var(--pad-open); }
+
+    /* ΦΑΚΕΛΟΣ */
+    .envelope-wrap{
+      width: var(--envelope-width);
+      height: var(--envelope-height);
+      z-index: 2;
+      transform-origin: top center;
+      transform: translateX(-50%) translateY(40%) scale(var(--envelope-scale));
+    }
+    .envelope-wrap img{
+      width:100%; height:100%; object-fit:cover; display:block;
+      filter: drop-shadow(0 64px 80px rgba(0,0,0,.45));
+    }
+    body.open .envelope-wrap{
+      opacity:0;
+      transform: translateX(-50%) scale(var(--envelope-scale));
+    }
+
+    /* ΓΡΑΜΜΑ */
+    .letter-wrap{
+      width: var(--letter-width);
+      height: var(--letter-height);
+      z-index: 1;
+      opacity: 0;
+      transform-origin: top center;
+      transform: translateX(-50%) scale(var(--letter-scale));
+      background: url("images/parchment.png") center/cover no-repeat;
+      box-shadow:
+        inset 100 100 180px rgba(0,0,0,.25),
+        0 200px 400px rgba(0,0,0,.45);
+      position: absolute;
+      overflow: visible;
+    }
+    body.open .letter-wrap{
+      opacity:1;
+      transform: translateX(-50%) scale(var(--letter-scale));
+    }
+    .letter-wrap::before{
+      content:"";
+      position:absolute; inset:0;
+      background: url("images/crest.png") center/var(--wm-size) no-repeat;
+      opacity: var(--wm-opacity);
+      pointer-events:none;
+      z-index: 0;
+    }
+    .letter-wrap { isolation:isolate; } /* blends να «δένουν» στο χαρτί */
+
+    /* Εσωτερικό κείμενο */
+    .letter-inner{
+      position: relative; z-index:1;
+      box-sizing: border-box;
+      width: min(var(--inner-col-max), calc(100% - 2*var(--inner-side-pad)));
+      margin: 60px auto;
+      padding-top: 40px;
+      color: #2b1f16;
+      font-family: "Lumos", serif;
+      font-size: 40px;
+      line-height: 1.7;
+      margin-bottom: 0;          /* καθάρισμα ουράς */
+    }
+
+    .crest-top{
+      display:block;
+      margin: 10px auto 18px;
+      width: var(--crest-width);
+      height:auto;
+      max-width: 90%;
+      filter: saturate(.6) contrast(.9);
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Τίτλος 2 γραμμών */
+    .letter-title{
+      text-align:center;
+      margin: 6px 0 10px;
+      line-height: 1.15;
+      color: #261a12;
+      mix-blend-mode: multiply;
+      opacity: .98;
+      text-shadow: 0 0.35px 0 rgba(0,0,0,.20), 0 0 0.35px rgba(0,0,0,.12);
+    }
+    .letter-title .title-line1,
+    .letter-title .title-line2{
+      display:block;
+      font-family: "Lumos","Cinzel Decorative",serif;
+      letter-spacing:.5px;
+    }
+    .letter-title .title-line1{ font-size:95px; padding-top:20px; }
+    .letter-title .title-line2{ font-size:95px; margin-top:2px; }
+    .letter-title .of, .letter-title .and{
+      font-family: "IM Fell English", serif;
+      font-style: italic;
+      font-size: 0.75em;
+      vertical-align: 0.06em;
+      letter-spacing: 0.2px;
+    }
+
+    /* Headmaster */
+    .headmaster-block{
+      text-align:center;
+      margin: 10px 0 24px;
+      padding-top: 0;
+      letter-spacing: 0.2em;
+      color:#261a12; mix-blend-mode:multiply; opacity:.98;
+      text-shadow: 0 0.35px 0 rgba(0,0,0,.20), 0 0 0.35px rgba(0,0,0,.12);
+    }
+    .headmaster-name{
+      font-family: "Lumos", serif;
+      font-variant: small-caps;
+      font-size: 30px;
+      margin-bottom: 6px;
+      padding-top: 60px;
+      letter-spacing: 0.4em;
+    }
+    .headmaster-quals{
+      font-family: "Lumos", serif;
+      font-style: italic;
+      font-size: 30px;
+      line-height: 1.5;
+      opacity: 0.9;
+    }
+
+    /* Κύριο σώμα */
+    .letter-body{
+      font-family: "Lumos", serif;
+      font-size: 48px;
+      letter-spacing: 0.2px;
+      color: #2b1f16;
+      margin-top: 40px;
+      line-height: 1.25;
+      max-width: 66ch;
+      margin-left: auto;
+      margin-right: auto;
+      padding-top: 50px;
+      mix-blend-mode:multiply; opacity:.98;
+      text-shadow: 0 0.35px 0 rgba(0,0,0,.20), 0 0 0.35px rgba(0,0,0,.12);
+    }
+    .letter-body p{ margin: 0 0 20px; }
+
+    /* Υπογραφή */
+    .signature{
+      font-family: "Brilliant", cursive;
+      font-size: 128px;
+      line-height: 1;
+      letter-spacing: 0;
+      color: #1a120d;
+      display: inline-block;
+      text-shadow: 0 0.6px 0 rgba(0,0,0,.15);
+      padding-top: 100px;
+      transform: translateX(-184px) translateY(-45px) rotate(-26deg);
+      filter: none;               /* καθαρότερη από το κείμενο */
+      mix-blend-mode: multiply;
+    }
+
+    /* Footer */
+    .footer{
+      font-family: "Lumos", serif;
+      font-size: 48px;
+      letter-spacing: 0.2px;
+      color: #2b1f16;
+      line-height: 1.2;
+      padding-top: 100px;
+      text-align: left;
+      padding-bottom: 0;
+      margin-bottom: 0;
+      mix-blend-mode:multiply; opacity:.98;
+      text-shadow: 0 0.35px 0 rgba(0,0,0,.20), 0 0 0.35px rgba(0,0,0,.12);
+    }
+
+    /* Blurred BG */
+    .bg-blur{
+      position: fixed;
+      inset: 0;
+      z-index: 0; /* ΣΗΜΑΝΤΙΚΟ: πάνω από body, κάτω από stage */
+      background: url("images/bg.png") center/cover no-repeat;
+      filter: blur(10px) saturate(.9) brightness(.55);
+      transform: scale(1.05);
+      pointer-events: none;
+      will-change: transform, filter;
+    }
+    .bg-blur::after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(120% 90% at 50% 45%,
+        rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.18) 60%, rgba(0,0,0,0.45) 100%);
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+    body::before{
+      content:"";
+      position: fixed; inset: 0;
+      z-index: -1;
+      background-image: url("images/noise.png");
+      background-size: 300px 300px;
+      opacity: .04;
+      pointer-events: none;
+    }
+
+    /* Mobile */
+    @media (max-width: 1200px){
+      :root{
+        --envelope-width: 86vw;
+        --envelope-height: 62vw;
+        --letter-width: 78vw;
+        --letter-height: 130vw;
+        --inner-col-max: 86vw;
+      }
+      .letter-inner{ margin: 40px auto; font-size: 18px; }
+      .letter-title .title-line1,
+      .letter-title .title-line2{ font-size: 42px; }
+      .signature{ font-size: 42px; }
+      .letter-body{ font-size: 22px; max-width: 60ch; }
+      .footer{ font-size: 26px; }
+    }
+
+    /* ——— ΚΛΕΙΣΤΟ (envelope): κόψε το scroll παντού ——— */
+body:not(.open){
+  overflow: hidden !important;
+}
+body:not(.open) .stage{
+  overflow: hidden !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  padding: 0 !important; /* χωρίς extra κενά γύρω γύρω */
+}
+
+/* ——— Κεντράρισμα φακέλου ακριβώς στο κέντρο ——— */
+/* Η .centered βάζει top:0, το παρακάμπτουμε εδώ για τον φάκελο */
+.envelope-wrap{
+  top: 50% !important;
+  left: 50% !important;
+  /* ΒΓΑΖΟΥΜΕ το translateY(40%) που δημιουργεί κενό
+     και κεντράρουμε και στους 2 άξονες */
+  transform: translate(-50%, -50%) scale(var(--envelope-scale)) !important;
+}
+
+/* Όταν ανοίγει, άσε το γράμμα να δουλέψει όπως πριν */
+body.open .stage{
+  overflow: visible !important;
+  padding: var(--pad-open) 0 !important;
+}
+
+/* Υπόδειξη κάτω από τον φάκελο */
+.click-hint{
+  position: absolute;
+  left: 50%;
+  bottom: -98px;                   /* πόσο κάτω από τον φάκελο */
+  transform: translateX(-50%);
+  font-family: "Lumos", serif;     /* ή όποια θες */
+  font-size: 52px;
+  letter-spacing: 0.12em;
+  color: #f0e6d2;
+  text-shadow: 0 2px 12px rgba(0,0,0,.6), 0 0 1px rgba(0,0,0,.8);
+  opacity: 1;
+  pointer-events: none;            /* να μην μπλοκάρει το κλικ στον φάκελο */
+  animation: hint-float 1.8s ease-in-out infinite;
+  z-index: 3;
+}
+
+/* Κρύψ’ το όταν ανοίγει το γράμμα */
+body.open .click-hint{
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+
+/* Απαλό “αιώρηση”/παλμός */
+@keyframes hint-float{
+  0%, 100% { transform: translate(-50%, 0); }
+  50%      { transform: translate(-50%, -6px); }
+}
+
+/* 1) Προοπτική για 3D αισθηση */
+.stage{
+  perspective: 1200px;
+  perspective-origin: 50% 40%;
+}
+
+/* 2) Κοινό drop-shadow (καλύτερο από απλό box-shadow για PNGs) */
+.envelope-wrap,
+.letter-wrap{
+  filter: drop-shadow(0 28px 32px rgba(0,0,0,.35))
+          drop-shadow(0 4px 8px rgba(0,0,0,.20));
+}
+
+/* 3) «Σκιά εδάφους» με pseudo-element */
+.envelope-wrap::after,
+.letter-wrap::after{
+  content:"";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 28px;
+  bottom: -22px;                      /* απόσταση από αντικείμενο */
+  background: radial-gradient(50% 50% at 50% 50%,
+              rgba(0,0,0,.35) 0%, rgba(0,0,0,0) 70%);
+  filter: blur(8px);
+  opacity: .7;
+  pointer-events: none;
+  z-index: -1;                        /* πίσω από το αντικείμενο */
+}
+body.open .envelope-wrap::after{ opacity: 0; }   /* κρύψε όταν ανοίγει */
+body:not(.open) .letter-wrap::after{ opacity: 0; } /* κρύψε όταν είναι κλειστό */
+
+/* 4) Απαλό 3D tilt για βάθος */
+body:not(.open) .envelope-wrap{
+  transform: translate(-50%, -50%) scale(var(--envelope-scale))
+             rotateX(8deg) rotateZ(-0.4deg) !important;
+  transform-origin: center top;
+}
+body.open .letter-wrap{
+  transform: translateX(-50%) scale(var(--letter-scale))
+             rotateX(3deg) rotateZ(0.15deg); /* πολύ διακριτικό */
+  transform-origin: center top;
+}
+
+/* 5) Highlight στο πάνω χείλος (σαν λάμψη/ανάγλυφο) */
+.envelope-wrap::before,
+.letter-wrap::before{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(to bottom,
+              rgba(255,255,255,.20), rgba(255,255,255,0) 18%);
+  mix-blend-mode: screen;
+  opacity: .35;
+  pointer-events: none;
+}
+body.open .envelope-wrap::before{ opacity: 0; }   /* κρύψε όταν ανοίγει */
+body:not(.open) .letter-wrap::before{ opacity: 0; } /* κρύψε όταν είναι κλειστό */
+
+/* 6) (Προαιρετικό) πολύ ελαφρύ float στο κλειστό envelope */
+@keyframes floaty {
+  0%,100% { transform: translate(-50%, -50%) scale(var(--envelope-scale)) rotateX(8deg) rotateZ(-0.4deg); }
+  50%     { transform: translate(calc(-50% + 0px), calc(-50% - 6px)) scale(var(--envelope-scale)) rotateX(8deg) rotateZ(-0.4deg); }
+}
+body:not(.open) .envelope-wrap{
+  animation: floaty 4s ease-in-out infinite;
+}
+
+/* Προστασία performance για χρήστες με reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .envelope-wrap, .letter-wrap{ animation: none !important; }
+}
+
+.sig-badge{
+  display: inline-block;
+  width: 140px;           /* ρύθμισε μέγεθος */
+  height: auto;
+  margin-left: 16px;      /* πόσο “κολλάει” δίπλα */
+  vertical-align: middle; /* ευθυγράμμιση με την υπογραφή */
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
+  mix-blend-mode: multiply; /* να “δένει” λίγο με την περγαμηνή */
+  transform: translateX(-304px)
+}
+
+  </style>
+</head>
+
+<body>
+  <div class="bg-blur"></div>
+
+  <!-- ΜΙΑ και ΜΟΝΑΔΙΚΗ stage -->
+  <div class="stage" id="stage">
+    <!-- ΦΑΚΕΛΟΣ -->
+    <div class="envelope-wrap centered" id="envelopeWrap">
+      <img src="images/envelope.png" alt="Hogwarts Envelope">
+      <div class="click-hint">click me</div>
+      
+    </div>
+
+    <!-- ΓΡΑΜΜΑ -->
+    <div class="letter-wrap centered" id="letterWrap">
+      <div class="letter-inner">
+        <img class="crest-top" src="images/crest.png" alt="Hogwarts Crest">
+
+        <div class="letter-title">
+          <span class="title-line1">HOGWARTS SCHOOL</span>
+          <span class="title-line2">
+            <span class="of">of</span> Witchcraft <span class="and">and</span> Wizardry
+          </span>
+        </div>
+
+        <div class="headmaster-block">
+          <div class="headmaster-name">HEADMASTER: ALBUS DUMBLEDORE</div>
+          <div class="headmaster-quals">
+            (Order of Merlin, First Class, Grand Sorc., Chf. Warlock,<br>
+            Supreme Mugwump, International Confed. of Wizards)
+          </div>
+        </div>
+
+        <div class="letter-body">
+          <p>Save the Date – and prepare your outfit!</p><br>
+          <p>Dear friends,</p><br>
+          <p>We are pleased to inform you that you have been invited to attend a most magical gathering in honor of Tiffany’s Birthday. This year’s celebration will also be a Halloween Party with a Harry Potter theme. This celebration shall take place at:</p><br>
+          <p><b>Date: Saturday, the 1st of November</b><br><br>
+             <b>Time: 19:30</b> <br><br>
+             <b>Location: Skopelou 1, Kypseli, 1st floor</b></p><br>
+          <p>You will find Butterbeer, enchanting treats, and magical surprises awaiting your arrival. Wands and wizarding robes are most welcome.</p><br>
+          <p>Muggles are kindly requested to wear black.</p><br>
+          <p>We await your owl (or RSVP) at the earliest convenience.</p><br>
+
+          <p>Yours sincerely,</p>
+          <div class="signature">Minerva McGonagall</div>
+          <img class="sig-badge" src="images/cat.png" alt="Wax Seal">
+
+          <div class="footer">
+            Deputy Headmistress<br>
+            Hogwarts School of Witchcraft and Wizardry
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ink-bleed filter (μπορείς να το κρατήσεις off αν δεν το χρειάζεσαι πια) -->
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="inkBleed" x="-2%" y="-2%" width="104%" height="104%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.25" result="blur"/>
+      <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3" result="noise"/>
+      <feDisplacementMap in="blur" in2="noise" scale="0.6" xChannelSelector="R" yChannelSelector="G" result="distort"/>
+      <feColorMatrix in="SourceGraphic" type="matrix"
+        values="0.95 0 0 0 0  0 0.95 0 0 0  0 0 0.95 0 0  0 0 0 1 0" result="ink"/>
+      <feMerge>
+        <feMergeNode in="ink"/>
+        <feMergeNode in="distort"/>
+      </feMerge>
+    </filter>
+  </svg>
+
+  <script>
+    const stage  = document.getElementById('stage');
+    const letter = document.getElementById('letterWrap');
+
+    function fitStageToLetter() {
+      if (!document.body.classList.contains('open')) return;
+      const root = getComputedStyle(document.documentElement);
+      const pad  = parseFloat(root.getPropertyValue('--pad-open')) || 10;
+
+      // ΠΡΑΓΜΑΤΙΚΟ ύψος ΜΕ scale
+      const rect = letter.getBoundingClientRect();
+      // Κλείδωσε ακριβώς: ύψος γράμματος + πάνω/κάτω περιθώριο
+      stage.style.height = Math.ceil(rect.height + pad * 2) + 'px';
+    }
+
+    // Toggle open/closed
+    stage.addEventListener('click', () => {
+      document.body.classList.toggle('open');
+
+      if (document.body.classList.contains('open')) {
+        // Δώσε ένα καρέ να “κάτσουν” opacity/transform και μετά μέτρησε
+        requestAnimationFrame(() => {
+          fitStageToLetter();
+          letter.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+        window.addEventListener('resize', fitStageToLetter);
+      } else {
+        // Κλειστό: μία οθόνη χωρίς scroll
+        stage.style.height = '100dvh';
+        window.removeEventListener('resize', fitStageToLetter);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  </script>
+</body>
+</html>
